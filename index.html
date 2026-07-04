@@ -51,7 +51,9 @@ body{margin:0;font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",syst
 .mode .mi{font-size:26px}
 .mode .mt{font-weight:800;margin-top:6px;font-size:1rem}
 .mode .md{font-size:.72rem;color:var(--sub);margin-top:2px}
-.mode.wide{grid-column:1/-1;display:flex;align-items:center;gap:14px}
+.mode.wide{grid-column:1/-1;width:100%;display:flex;align-items:center;gap:14px}
+.modes .mode:last-child:nth-child(odd){grid-column:1/-1}
+@media (min-width:820px){:root{--wrap:880px}.modes{grid-template-columns:repeat(3,1fr)}}
 .mode.wide .mi{font-size:30px}
 .mode.wide .mt{margin-top:0}
 .chip{display:inline-flex;align-items:center;gap:5px;background:var(--soft);color:var(--accent);border-radius:20px;padding:4px 11px;font-size:.72rem;font-weight:700}
