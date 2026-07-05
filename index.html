@@ -259,7 +259,7 @@ function renderHome(){
 let sess=null;  // {list, i, mode, picks:{}, timed, t0, timerId, title}
 function startExam(y){
   const list=usableR.filter(q=>q.year===y).sort((a,b)=>a.no-b.no);
-  sess={list,i:0,mode:'exam',picks:{},timed:true,t0:Date.now(),title:`${y} 年 · 整卷閱讀模擬`};
+  sess={list,i:0,mode:'exam',picks:{},timed:true,t0:Date.now(),title:`${y} 年 · 整卷模擬`};
   startTimer(); go('run'); drawRun();
 }
 function startType(t){
@@ -494,7 +494,7 @@ function renderSettings(){
     </div>
     <div class="card" style="font-size:.78rem;color:var(--sub);line-height:1.8">
       <b>關於</b><br>題目為 <b>大學入學考試中心 學科能力測驗 英文考科 官方公開試題（110–115）</b>。
-      閱讀 ${QB.meta.readingUsable} 題${usableL.length?`、聽力 ${usableL.length} 題`:''}可練；少數需對照原卷插圖的圖表／看圖題已隱藏。僅供教學與自學練習。
+      練習題 ${QB.meta.readingUsable} 題${usableL.length?`、聽力 ${usableL.length} 題`:''}可練；少數需對照原卷插圖的圖表／看圖題已隱藏。僅供教學與自學練習。
     </div>`;
 }
 function resetAll(){ if(confirm('確定清除所有作答與錯題紀錄？（收藏會保留）')){S.rec={};S.wrong=[];S.daily={};save();renderSettings();alert('已清除');} }
@@ -511,6 +511,8 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catc
 renderHome();
 </script>
 
+
+
 <script>/*ENGWC*/(function(){if(window.__engwc)return;window.__engwc=1;
 var CFG={"ns": "gsat-qbank", "emoji": "🎯", "title": "學測英語題庫", "theme": "#0e7490", "tagline": "大考中心歷屆五大題型", "steps": [["📝", "整卷模擬", "計時做整份歷屆考卷，仿真應考。"], ["🎯", "題型專練", "針對比較弱的題型單獨練習。"], ["❌", "錯題本", "答錯自動收錄，之後回來重練。"], ["📲", "安裝到桌面", "裝起來離線也能練。"]]};var K='engwc.'+CFG.ns+'.done';
 var css='.engwc-ov{position:fixed;inset:0;background:rgba(28,28,40,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px}'
@@ -524,13 +526,15 @@ var css='.engwc-ov{position:fixed;inset:0;background:rgba(28,28,40,.55);-webkit-
 +'.engwc-i{font-size:21px;flex:0 0 auto;line-height:1.3}'
 +'.engwc-step b{font-size:14.5px}.engwc-step>div>div{font-size:12.5px;color:#7a7a86;line-height:1.5;margin-top:1px}'
 +'.engwc-start{width:100%;border:0;border-radius:14px;padding:13px;font-size:15.5px;font-weight:800;color:#fff;background:'+CFG.theme+';cursor:pointer;margin-top:8px;font-family:inherit}'
-+'.engwc-help{position:fixed;left:calc(12px + env(safe-area-inset-left));bottom:calc(76px + env(safe-area-inset-bottom));z-index:2147482000;width:40px;height:40px;border-radius:50%;border:1px solid #e2e2ea;background:rgba(255,255,255,.94);color:#666;font-size:18px;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.18);padding:0}';
++'.engwc-help{position:fixed;left:calc(12px + env(safe-area-inset-left));bottom:calc(76px + env(safe-area-inset-bottom));z-index:2147482000;width:40px;height:40px;border-radius:50%;border:1px solid #e2e2ea;background:rgba(255,255,255,.94);color:#666;font-size:18px;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.18);padding:0}'
++'.engwc-home{position:fixed;left:calc(60px + env(safe-area-inset-left));bottom:calc(76px + env(safe-area-inset-bottom));z-index:2147482000;height:40px;border-radius:20px;border:1px solid #e2e2ea;background:rgba(255,255,255,.94);color:#555;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.18);padding:0 13px}';
 var st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 var steps=CFG.steps.map(function(s){return '<div class=\"engwc-step\"><span class=\"engwc-i\">'+s[0]+'</span><div><b>'+s[1]+'</b><div>'+s[2]+'</div></div></div>';}).join('');
 var ov=document.createElement('div');ov.className='engwc-ov';
 ov.innerHTML='<div class=\"engwc-card\"><div class=\"engwc-emoji\">'+CFG.emoji+'</div><div class=\"engwc-h\">歡迎使用 '+CFG.title+'</div><div class=\"engwc-sub\">'+CFG.tagline+'</div>'+steps+'<button class=\"engwc-start\">開始使用 ▶</button></div>';
 document.body.appendChild(ov);
 var hb=document.createElement('button');hb.className='engwc-help';hb.setAttribute('aria-label','使用說明');hb.textContent='❓';document.body.appendChild(hb);
+if(CFG.ns!=='english-hub'){var hm=document.createElement('button');hm.className='engwc-home';hm.setAttribute('aria-label','回英語一點通入口');hm.innerHTML='⬅ 入口';hm.addEventListener('click',function(){location.href='https://fullmodel-star.github.io/english-hub/';});document.body.appendChild(hm);}
 function show(){ov.classList.add('show');}function close(){ov.classList.remove('show');try{localStorage.setItem(K,'1');}catch(e){}}
 ov.querySelector('.engwc-start').addEventListener('click',close);
 ov.addEventListener('click',function(e){if(e.target===ov)close();});
