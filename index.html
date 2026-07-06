@@ -190,6 +190,12 @@ function markAns(q,pick){
   const set=new Set(S.wrong);
   if(ok) set.delete(q.id); else set.add(q.id);
   S.wrong=[...set]; save();
+  try{ if(window.EngReview){
+    const ks=Object.keys(q.options||{}).filter(k=>q.options[k]!=null);
+    if(!ok){ const p=passageOf(q); const cat=(q.id&&q.id[0]==='L')?'聽力':(q.type||'題目');
+      const stem=(p?('📄'+(p.topic||p.genre||'閱讀')+'：'):'')+(q.stem||'（請看題目）');
+      EngReview.addWrong({cat:cat,stem:stem,options:ks.map(k=>q.options[k]),your:ks.indexOf(pick),ans:ks.indexOf(q.answer),expl:q.expl||''}); }
+  }}catch(e){}
   return ok;
 }
 function passageOf(q){ return q.pkey?PS[q.pkey]:null }
