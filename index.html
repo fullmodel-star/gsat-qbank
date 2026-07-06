@@ -263,8 +263,16 @@ function startExam(y){
   startTimer(); go('run'); drawRun();
 }
 function startType(t){
-  const list=shuffle(usableR.filter(q=>q.type===t));
-  sess={list,i:0,mode:'practice',picks:{},timed:false,title:`題型專練 · ${t}`};
+  const raw=usableR.filter(q=>q.type===t);
+  const hasP=raw.some(q=>q.pkey);
+  let list, grouped=false;
+  if(hasP){ // 閱讀題組：打散文章順序，但同篇題目留在一起、依題號排 → 整組作答再一次揭曉
+    const byP={}, order=[];
+    raw.forEach(q=>{const k=q.pkey||q.id; if(!byP[k]){byP[k]=[];order.push(k);} byP[k].push(q);});
+    list=shuffle(order).reduce((a,k)=>a.concat(byP[k].slice().sort((x,y)=>(x.no||0)-(y.no||0))),[]);
+    grouped=true;
+  } else { list=shuffle(raw); }
+  sess={list,i:0,mode:'practice',picks:{},timed:false,title:`題型專練 · ${t}`,grouped};
   go('run'); drawRun();
 }
 function startListen(){
@@ -302,10 +310,51 @@ function startTimer(){ stopTimer(); timerId=setInterval(()=>{const el=$('#timer'
 function stopTimer(){ if(timerId)clearInterval(timerId); timerId=null; }
 function fmtT(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
 
+function groupRange(i){const pk=sess.list[i].pkey;if(!pk)return[i,i];let s=i,e=i;while(s>0&&sess.list[s-1].pkey===pk)s--;while(e<sess.list.length-1&&sess.list[e+1].pkey===pk)e++;return[s,e];}
+function pickG(qid,k){ if(sess.revealed&&sess.revealed.has(byId[qid]&&byId[qid].pkey))return; sess.picks[qid]=k; drawRun(); }
+function revealGroup(){ const[gs,ge]=groupRange(sess.i);const grp=sess.list.slice(gs,ge+1);const pk=grp[0].pkey; sess.revealed=sess.revealed||new Set(); if(sess.revealed.has(pk))return; sess.revealed.add(pk); grp.forEach(q=>{if(sess.picks[q.id]!=null)markAns(q,sess.picks[q.id]);}); drawRun(); }
+function drawGroup(){
+  let[gs,ge]=groupRange(sess.i); if(sess.i!==gs)sess.i=gs;
+  const grp=sess.list.slice(gs,ge+1), p=passageOf(grp[0]);
+  const rv=!!(sess.revealed&&sess.revealed.has(grp[0].pkey));
+  const allAns=grp.every(q=>sess.picks[q.id]!=null);
+  let qs='',correct=0;
+  grp.forEach((q,gi)=>{
+    const picked=sess.picks[q.id];
+    const opts=Object.entries(q.options||{}).filter(([k,v])=>v!=null).map(([k,v])=>{
+      let cls='opt';
+      if(rv){ if(k===q.answer)cls+=' correct'; else if(k===picked)cls+=' wrong'; }
+      else if(k===picked)cls+=' sel';
+      return `<button class="${cls}" ${rv?'disabled':''} onclick="pickG('${q.id}','${k}')"><span class="k">${k}</span><span class="v">${esc(v)}</span></button>`;
+    }).join('');
+    let fb='';
+    if(rv){ const ok=picked===q.answer; if(ok)correct++;
+      fb=`<div class="fb ${ok?'ok':'no'}">${ok?'✅ 答對':(picked==null?'⬜ 未作答':'❌ 答錯')}．正解 ${q.answer}</div>${q.expl?`<div class="expl">💡 ${esc(q.expl)}</div>`:''}`; }
+    qs+=`<div class="qcard" style="margin-bottom:10px"><div class="stem">${gi+1}. ${esc(q.stem||'')}</div><div class="opts">${opts}</div>${fb}</div>`;
+  });
+  const action = rv
+    ? `<div class="fb ok" style="text-align:center">📖 本篇答對 ${correct}/${grp.length} 題</div>`
+    : `<button class="btn" ${allAns?'':'disabled'} onclick="revealGroup()" style="width:100%">✅ 對答案（整篇 ${grp.length} 題）</button>`;
+  $('#v-run').innerHTML=`
+    <div style="display:flex;align-items:center">
+      <button class="back" onclick="quitRun()" style="flex:1;text-align:left">‹ 結束</button>
+    </div>
+    <div class="qhead"><div class="prog"><i style="width:${(ge+1)/sess.list.length*100}%"></i></div><div class="cnt">${gs+1}-${ge+1}/${sess.list.length}</div></div>
+    <div style="font-weight:800;font-size:.8rem;color:var(--sub);margin-bottom:8px">${esc(sess.title)}　📖 讀完整篇、整組答完再對答案</div>
+    <div class="passage"><div class="pg">📄 ${esc(p.genre)}｜${esc(p.topic)}</div>${esc(p.text)}</div>
+    ${qs}${action}
+    <div class="foot"><div class="in">
+      ${gs>0?'<button class="btn ghost" onclick="prevGroup()">‹ 上一篇</button>':''}
+      <button class="btn" id="nextBtn" ${rv?'':'disabled'} onclick="nextGroup()">${ge+1<sess.list.length?'下一篇 ›':'看結果'}</button>
+    </div></div>`;
+}
+function nextGroup(){ const[,ge]=groupRange(sess.i); if(ge+1<sess.list.length){sess.i=ge+1;drawRun();}else finish(); }
+function prevGroup(){ const[gs]=groupRange(sess.i); if(gs>0){const[ps]=groupRange(gs-1);sess.i=ps;drawRun();} }
 function drawRun(){
   const q=sess.list[sess.i]; if(!q){finish();return;}
   const isL=sess.mode==='listen'||q.id[0]==='L';
   const p=passageOf(q);
+  if(sess.grouped && p && !isL){ return drawGroup(); }
   const picked=sess.picks[q.id];
   const answered=picked!=null;
   const immediate=sess.mode!=='exam';
