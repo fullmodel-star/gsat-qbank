@@ -168,6 +168,7 @@ const TYPES = [...new Set(usableR.map(q=>q.type))].sort((a,b)=>{
 
 /* ---------- storage ---------- */
 const LS='gsat_qb_v1';
+/*DEEPLINK-WRONG*/(function(){function g(){try{if(/[?&]wrong=1/.test(location.search)&&typeof go==='function')go('wrong');}catch(e){}}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',function(){setTimeout(g,300)});else setTimeout(g,300);})();
 let S = load();
 function load(){ try{return JSON.parse(localStorage.getItem(LS))||{}}catch(e){return{}} }
 function save(){ try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){} }
