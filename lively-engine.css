@@ -1,0 +1,126 @@
+/* 活潑層 engine：qbank（915 會考／916 學測 官方題庫引擎）
+   來源：packages/lively/engines/qbank.css → 各 App 的 lively-engine.css */
+
+/* ---------- 把 App 原本的變數接到色票 ----------
+   App 自己的深色寫在 :root[data-theme=dark] 與 @media(dark){:root:not([data-theme=light])}（權重 0,2,0），
+   這裡用 :root:root:root（0,3,0）＋ body 蓋過；--lv-* 本身已依 data-theme／跟系統切換，所以一組就涵蓋淺色、
+   手動深色、跟系統深色三種情況。--muted 是品牌層（頁尾簽名）的，不動。 */
+:root:root:root,body{
+  --bg:var(--lv-paper); --card:var(--lv-card); --line:var(--lv-line); --ink:var(--lv-text); --sub:var(--lv-muted);
+  --accent:var(--lv-acc); --accent2:var(--lv-soft2); --soft:var(--lv-soft);
+  --good:var(--lv-ok); --goodbg:var(--lv-ok-soft); --bad:var(--lv-no); --badbg:var(--lv-no-soft);
+  --shadow:0 0 0 1px var(--lv-line),0 4px 14px rgba(60,50,30,.06);
+}
+html[data-theme="dark"] body{--shadow:0 0 0 1px var(--lv-line)}
+@media (prefers-color-scheme:dark){html:not([data-theme]) body{--shadow:0 0 0 1px var(--lv-line)}}
+html,body{background:var(--lv-paper)}
+
+/* 數字用圓體（只含拉丁字，中文自動退回系統字） */
+.stat b,.result .score,.scorebig,.timer,.qhead .cnt,.opt .k,.opt .lab{font-family:"LvNum",-apple-system,"Segoe UI",system-ui,"PingFang TC","Microsoft JhengHei",sans-serif}
+
+/* ---------- 頁首右上齒輪（頁首已改淡底；品牌山形與 App 名不動） ---------- */
+.rl-appbar .iconbtn{background:color-mix(in srgb,var(--lv-text) 7%,transparent);color:var(--lv-text)}
+
+/* ---------- 首頁：倒數、三格統計、模式卡 ---------- */
+.cd{background:var(--lv-soft);color:var(--lv-text);border-radius:20px;box-shadow:0 0 0 1.5px var(--lv-soft2)}
+.cd b{color:var(--lv-acc)}
+.cd small{opacity:1;color:var(--lv-muted)}
+.cd.past{background:var(--lv-card);box-shadow:0 0 0 1.5px var(--lv-line)}
+.cd.past b{color:var(--lv-text)}
+.stat{border-radius:20px}
+.stat b{font-size:1.7rem;font-weight:900;color:var(--lv-acc)}
+.sect{color:var(--lv-muted)}
+
+.mode{border:0;border-radius:20px;box-shadow:0 0 0 1.5px var(--lv-line),0 4px 0 var(--lv-line);transition:transform .08s,box-shadow .08s}
+.mode:active{transform:translateY(3px);box-shadow:0 0 0 1.5px var(--lv-line),0 1px 0 var(--lv-line)}
+.mode .mi{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--lv-soft);font-size:24px;line-height:1;flex:0 0 auto}
+.mode.wide .mi{font-size:26px}
+.mode .mi[data-tint="green"]{background:var(--lv-ok-soft)}
+.mode .mi[data-tint="sun"]{background:var(--lv-sun-soft)}
+.mode .mt{margin-top:8px}
+.mode.wide .mt{margin-top:0}
+/* 每日一練＝首頁唯一的主色重點：中淺色底＋深色字、有厚度 */
+.mode.daily{background:var(--lv-btn);color:var(--lv-ink);box-shadow:0 4px 0 var(--lv-btn-d)}
+.mode.daily:active{box-shadow:0 1px 0 var(--lv-btn-d)}
+.mode.daily .md{color:var(--lv-ink)}
+.mode.daily .mi{background:color-mix(in srgb,#fff 50%,transparent)}
+.mode.daily.ok{background:var(--lv-ok-soft);color:var(--lv-ok);box-shadow:0 0 0 1.5px var(--lv-ok-line),0 4px 0 var(--lv-ok-line)}
+.mode.daily.ok .md{color:var(--lv-ok);opacity:1}
+.mode.daily.ok .mi{background:var(--lv-card)}
+
+/* 年度按鈕（整卷模擬／916 非選年份） */
+.pbtn{border:0;border-radius:16px;box-shadow:0 0 0 1.5px var(--lv-line),0 4px 0 var(--lv-line);transition:transform .08s,box-shadow .08s}
+.pbtn:active{transform:translateY(3px);box-shadow:0 0 0 1.5px var(--lv-line),0 1px 0 var(--lv-line)}
+.pbtn.on{background:var(--lv-soft);color:var(--lv-acc);box-shadow:0 0 0 2px var(--lv-btn),0 4px 0 var(--lv-btn-d)}
+.pbtn.on small{color:var(--lv-acc)}
+.chip,.tag,.timer{background:var(--lv-soft);color:var(--lv-acc)}
+
+/* ---------- 作答 ---------- */
+.qhead .prog{background:var(--lv-line)}
+.qhead .prog i{background:var(--lv-btn);border-radius:99px}
+.passage{border-radius:16px;border-left-color:var(--lv-soft2)}
+.expl{border-left-color:var(--lv-btn)}
+.opt{border:0;border-radius:16px;box-shadow:0 0 0 1.5px var(--lv-line),0 3px 0 var(--lv-line)}
+.opt:not([disabled]):active{transform:translateY(3px);box-shadow:0 0 0 1.5px var(--lv-line),0 0 0 var(--lv-line)}
+.opt .k,.opt .lab{flex:0 0 28px;height:28px;border-radius:9px;background:var(--lv-soft);color:var(--lv-acc);font-weight:800;display:grid;place-items:center;font-size:.9rem}
+.opt.sel{background:var(--lv-soft);box-shadow:0 0 0 2px var(--lv-btn),0 3px 0 var(--lv-btn-d)}
+.opt.sel .k{background:var(--lv-btn);color:var(--lv-ink)}
+/* 答對綠、答錯珊瑚紅（總複習／嚴格錯題本用的是 .ok／.no，App 原本沒有樣式，一起接上） */
+.opt.correct,.opt.ok{background:var(--lv-ok-soft);color:var(--lv-ok);box-shadow:0 0 0 2px var(--lv-ok-line),0 3px 0 var(--lv-ok-line)}
+.opt.correct .k,.opt.ok .lab{background:var(--lv-ok-k);color:#fff}
+.opt.wrong,.opt.no{background:var(--lv-no-soft);color:var(--lv-no);box-shadow:0 0 0 2px var(--lv-no-line),0 3px 0 var(--lv-no-line)}
+.opt.wrong .k,.opt.no .lab{background:var(--lv-no-k);color:#fff}
+.fb{border-radius:14px}
+.fb:empty{display:none}
+/* 總複習／錯題本的回饋框裡還有整段解析 → 標題用語意色、解析用一般字色 */
+.fb.good{background:var(--lv-ok-soft);color:var(--lv-text);font-weight:500}
+.fb.bad{background:var(--lv-no-soft);color:var(--lv-text);font-weight:500}
+.fb.good b{color:var(--lv-ok)}
+.fb.bad b{color:var(--lv-no)}
+/* 聽力播放鈕 */
+.audio{border-radius:18px}
+.audio button{background:var(--lv-btn);color:var(--lv-ink);box-shadow:0 4px 0 var(--lv-btn-d)}
+.audio button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--lv-btn-d)}
+/* 作答／結果頁的返回、收藏鈕（App 原本在結果頁是白字白底，看不見） */
+.wrap .iconbtn{background:var(--lv-soft);color:var(--lv-acc)}
+.wrap .iconbtn.faved{background:var(--lv-sun-soft);color:var(--lv-sun)}
+
+/* 總複習／嚴格錯題本的版面（App 沒有寫樣式的 class） */
+.rhead{display:flex;align-items:center;gap:10px;margin:4px 0 10px;font-size:1rem}
+.btnrow{display:flex;gap:10px;margin-top:14px}
+.btnrow .btn{flex:1}
+.scorebig{text-align:center;font-size:3rem;font-weight:900;line-height:1.1;color:var(--lv-acc);padding:14px 0 10px}
+.card[style*="#2E86A8"]{border-left-color:var(--lv-btn)!important}
+.card i[style*="#2E86A8"]{background:var(--lv-btn)!important}
+
+/* ---------- 按鈕：中淺色底＋深色字、有厚度 ---------- */
+.btn{background:var(--lv-btn);color:var(--lv-ink);border-radius:16px;box-shadow:0 4px 0 var(--lv-btn-d);transition:transform .08s,box-shadow .08s}
+.btn:not(:disabled):active{transform:translateY(3px);box-shadow:0 1px 0 var(--lv-btn-d)}
+.btn.ghost{background:var(--lv-card);color:var(--lv-text);border:0;box-shadow:0 0 0 1.5px var(--lv-line),0 4px 0 var(--lv-line)}
+.btn.ghost:not(:disabled):active{box-shadow:0 0 0 1.5px var(--lv-line),0 1px 0 var(--lv-line)}
+.btn:disabled{box-shadow:none}
+.foot{background:var(--lv-card);border-top-color:var(--lv-line)}
+.switch.on{background:var(--lv-btn)}
+.result .score{color:var(--lv-acc)}
+.result .big{border-radius:22px}
+.card{border-radius:20px}
+.rev-item{border-radius:14px}
+
+/* ---------- 底部選單 ---------- */
+.nav{background:var(--lv-card);border-top-color:var(--lv-line)}
+.nav button .ni{display:flex;align-items:center;justify-content:center;width:46px;height:28px;margin:0 auto 1px;border-radius:14px;transition:background .2s}
+.nav button.on{color:var(--lv-acc)}
+.nav button.on .ni{background:var(--lv-soft)}
+
+/* ---------- 家族「📝 複習」浮動鈕與面板主按鈕（原本寫死紫色）→ 同色系 ---------- */
+body .rvc-fab{background:var(--lv-btn);color:var(--lv-ink);box-shadow:0 4px 0 var(--lv-btn-d)}
+body .rvc-fab .bdg{background:var(--lv-card);color:var(--lv-acc)}
+body .rvc-primary{background:var(--lv-btn);color:var(--lv-ink);box-shadow:0 4px 0 var(--lv-btn-d)}
+body .rvc-tab button.on{background:var(--lv-btn);color:var(--lv-ink)}
+
+@media (prefers-reduced-motion:no-preference){
+  .mode.daily:not(.ok){animation:lvQbBreath 2.8s ease-in-out infinite}
+  .mode.daily:active{animation:none}
+  .nav button.on .lv-ico-sm{animation:lvPop .4s cubic-bezier(.3,1.6,.5,1)}
+}
+@keyframes lvQbBreath{0%,100%{box-shadow:0 4px 0 var(--lv-btn-d),0 0 0 0 transparent}50%{box-shadow:0 4px 0 var(--lv-btn-d),0 0 0 7px color-mix(in srgb,var(--lv-btn) 22%,transparent)}}
